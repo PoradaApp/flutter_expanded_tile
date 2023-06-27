@@ -265,14 +265,16 @@ class ExpandedTile extends StatefulWidget {
 }
 
 class _ExpandedTileState extends State<ExpandedTile> with SingleTickerProviderStateMixin {
+  late ExpandedTileController controller;
   late bool _isExpanded;
   @override
   void initState() {
-    _isExpanded = widget.controller.isExpanded;
-    widget.controller.addListener(() {
+    controller = widget.controller;
+    _isExpanded = controller.isExpanded;
+    controller.addListener(() {
       if (mounted) {
         setState(() {
-          _isExpanded = widget.controller.isExpanded;
+          _isExpanded = controller.isExpanded;
         });
       }
     });
@@ -306,6 +308,7 @@ class _ExpandedTileState extends State<ExpandedTile> with SingleTickerProviderSt
             onTap: !widget.enabled
                 ? () {}
                 : () {
+                    controller.toggle();
                     if (widget.onTap != null) {
                       return widget.onTap!();
                     }
@@ -313,6 +316,7 @@ class _ExpandedTileState extends State<ExpandedTile> with SingleTickerProviderSt
             onLongPress: !widget.enabled
                 ? () {}
                 : () {
+                    controller.toggle();
                     if (widget.onLongTap != null) {
                       return widget.onLongTap!();
                     }
