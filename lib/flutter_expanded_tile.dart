@@ -42,7 +42,7 @@ class ExpandedTileController extends ChangeNotifier {
 
   /// Getter for the current expansion state of the [ExpandedTile] widget.
   bool get isExpanded => _isExpanded;
-  set _setExpanded(bool ex) {
+  set setExpanded(bool ex) {
     _isExpanded = ex;
   }
 
@@ -61,13 +61,13 @@ class ExpandedTileController extends ChangeNotifier {
 
   /// VoidCallback that expands the [ExpandedTile] widget if it is collapsed.
   void expand() {
-    _setExpanded = true;
+    setExpanded = true;
     notifyListeners();
   }
 
   /// VoidCallback that collapses the [ExpandedTile] widget if it is expanded.
   void collapse() {
-    _setExpanded = false;
+    setExpanded = false;
     notifyListeners();
   }
 
@@ -103,6 +103,7 @@ class ExpandedTileThemeData {
   final Color? headerSplashColor;
   final EdgeInsetsGeometry? headerPadding;
   final BorderRadius? headerRadius;
+  final BorderRadius? expandedHeaderRadius;
   // leading
   final EdgeInsetsGeometry? leadingPadding;
   // title
@@ -113,8 +114,11 @@ class ExpandedTileThemeData {
   final Color? contentBackgroundColor;
   final EdgeInsetsGeometry? contentPadding;
   final BorderRadiusGeometry? contentRadius;
+  final BorderRadiusGeometry? expandedContentRadius;
   const ExpandedTileThemeData({
     key,
+    this.expandedContentRadius,
+    this.expandedHeaderRadius,
     this.headerColor = const Color(0xfffafafa),
     this.headerSplashColor = const Color(0xffeeeeee),
     this.headerPadding = const EdgeInsets.all(16.0),
@@ -261,16 +265,14 @@ class ExpandedTile extends StatefulWidget {
 }
 
 class _ExpandedTileState extends State<ExpandedTile> with SingleTickerProviderStateMixin {
-  late ExpandedTileController tileController;
   late bool _isExpanded;
   @override
   void initState() {
-    tileController = widget.controller;
-    _isExpanded = tileController.isExpanded;
-    tileController.addListener(() {
+    _isExpanded = widget.controller.isExpanded;
+    widget.controller.addListener(() {
       if (mounted) {
         setState(() {
-          _isExpanded = tileController.isExpanded;
+          _isExpanded = widget.controller.isExpanded;
         });
       }
     });
@@ -296,16 +298,15 @@ class _ExpandedTileState extends State<ExpandedTile> with SingleTickerProviderSt
         //* Header
         Material(
           color: widget.theme!.headerColor,
-          borderRadius: widget.theme!.headerRadius,
+          borderRadius: widget.controller.isExpanded ? widget.theme!.expandedHeaderRadius : widget.theme!.headerRadius,
           child: InkWell(
-            borderRadius: widget.theme!.headerRadius,
+            borderRadius:
+                widget.controller.isExpanded ? widget.theme!.expandedHeaderRadius : widget.theme!.headerRadius,
             splashColor: widget.theme!.headerSplashColor,
             onTap: !widget.enabled
                 ? () {}
                 : () {
-                    tileController.toggle();
                     if (widget.onTap != null) {
-                      setState(() {});
                       return widget.onTap!();
                     }
                   },
@@ -313,13 +314,13 @@ class _ExpandedTileState extends State<ExpandedTile> with SingleTickerProviderSt
                 ? () {}
                 : () {
                     if (widget.onLongTap != null) {
-                      setState(() {});
                       return widget.onLongTap!();
                     }
                   },
             child: Container(
               decoration: BoxDecoration(
-                borderRadius: widget.theme!.headerRadius,
+                borderRadius:
+                    widget.controller.isExpanded ? widget.theme!.expandedHeaderRadius : widget.theme!.headerRadius,
               ),
               padding: widget.theme!.headerPadding,
               child: Row(
@@ -363,7 +364,10 @@ class _ExpandedTileState extends State<ExpandedTile> with SingleTickerProviderSt
                     ? null
                     : Container(
                         decoration: BoxDecoration(
-                            color: widget.theme!.contentBackgroundColor, borderRadius: widget.theme!.contentRadius),
+                            color: widget.theme!.contentBackgroundColor,
+                            borderRadius: widget.controller.isExpanded
+                                ? widget.theme!.expandedContentRadius
+                                : widget.theme!.contentRadius),
                         padding: widget.theme!.contentPadding,
                         width: double.infinity,
                         child: widget.content,
@@ -377,7 +381,10 @@ class _ExpandedTileState extends State<ExpandedTile> with SingleTickerProviderSt
                       ? null
                       : Container(
                           decoration: BoxDecoration(
-                              color: widget.theme!.contentBackgroundColor, borderRadius: widget.theme!.contentRadius),
+                              color: widget.theme!.contentBackgroundColor,
+                              borderRadius: widget.controller.isExpanded
+                                  ? widget.theme!.expandedContentRadius
+                                  : widget.theme!.contentRadius),
                           padding: widget.theme!.contentPadding,
                           width: double.infinity,
                           child: widget.content,
