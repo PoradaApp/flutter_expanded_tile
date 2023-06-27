@@ -305,6 +305,7 @@ class _ExpandedTileState extends State<ExpandedTile> with SingleTickerProviderSt
                 : () {
                     tileController.toggle();
                     if (widget.onTap != null) {
+                      setState(() {});
                       return widget.onTap!();
                     }
                   },
@@ -312,6 +313,7 @@ class _ExpandedTileState extends State<ExpandedTile> with SingleTickerProviderSt
                 ? () {}
                 : () {
                     if (widget.onLongTap != null) {
+                      setState(() {});
                       return widget.onLongTap!();
                     }
                   },
