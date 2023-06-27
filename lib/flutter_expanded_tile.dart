@@ -102,7 +102,7 @@ class ExpandedTileThemeData {
   final Color? headerColor;
   final Color? headerSplashColor;
   final EdgeInsetsGeometry? headerPadding;
-  final double? headerRadius;
+  final BorderRadius? headerRadius;
   // leading
   final EdgeInsetsGeometry? leadingPadding;
   // title
@@ -112,19 +112,19 @@ class ExpandedTileThemeData {
   ////? Content
   final Color? contentBackgroundColor;
   final EdgeInsetsGeometry? contentPadding;
-  final double? contentRadius;
+  final BorderRadiusGeometry? contentRadius;
   const ExpandedTileThemeData({
     key,
     this.headerColor = const Color(0xfffafafa),
     this.headerSplashColor = const Color(0xffeeeeee),
     this.headerPadding = const EdgeInsets.all(16.0),
-    this.headerRadius = 8.0,
-    this.leadingPadding = const EdgeInsets.symmetric(horizontal: 4.0),
-    this.titlePadding = const EdgeInsets.symmetric(horizontal: 12.0),
+    this.headerRadius,
+    this.leadingPadding = EdgeInsets.zero,
+    this.titlePadding = EdgeInsets.zero,
     this.trailingPadding = const EdgeInsets.symmetric(horizontal: 4.0),
     this.contentBackgroundColor = const Color(0xffeeeeee),
-    this.contentPadding = const EdgeInsets.all(16.0),
-    this.contentRadius = 8.0,
+    this.contentPadding = EdgeInsets.zero,
+    this.contentRadius,
   });
 }
 
@@ -249,8 +249,7 @@ class ExpandedTile extends StatefulWidget {
       theme: theme ?? this.theme,
       disableAnimation: disableAnimation ?? this.disableAnimation,
       expansionDuration: expansionDuration ?? this.expansionDuration,
-      expansionAnimationCurve:
-          expansionAnimationCurve ?? this.expansionAnimationCurve,
+      expansionAnimationCurve: expansionAnimationCurve ?? this.expansionAnimationCurve,
       onTap: onTap ?? this.onTap,
       onLongTap: onLongTap ?? this.onLongTap,
       // Misc
@@ -261,8 +260,7 @@ class ExpandedTile extends StatefulWidget {
   _ExpandedTileState createState() => _ExpandedTileState();
 }
 
-class _ExpandedTileState extends State<ExpandedTile>
-    with SingleTickerProviderStateMixin {
+class _ExpandedTileState extends State<ExpandedTile> with SingleTickerProviderStateMixin {
   late ExpandedTileController tileController;
   late bool _isExpanded;
   @override
@@ -298,9 +296,9 @@ class _ExpandedTileState extends State<ExpandedTile>
         //* Header
         Material(
           color: widget.theme!.headerColor,
-          borderRadius: BorderRadius.circular(widget.theme!.headerRadius!),
+          borderRadius: widget.theme!.headerRadius,
           child: InkWell(
-            borderRadius: BorderRadius.circular(widget.theme!.headerRadius!),
+            borderRadius: widget.theme!.headerRadius,
             splashColor: widget.theme!.headerSplashColor,
             onTap: !widget.enabled
                 ? () {}
@@ -319,8 +317,7 @@ class _ExpandedTileState extends State<ExpandedTile>
                   },
             child: Container(
               decoration: BoxDecoration(
-                borderRadius:
-                    BorderRadius.circular(widget.theme!.headerRadius!),
+                borderRadius: widget.theme!.headerRadius,
               ),
               padding: widget.theme!.headerPadding,
               child: Row(
@@ -364,10 +361,7 @@ class _ExpandedTileState extends State<ExpandedTile>
                     ? null
                     : Container(
                         decoration: BoxDecoration(
-                          color: widget.theme!.contentBackgroundColor,
-                          borderRadius: BorderRadius.circular(
-                              widget.theme!.contentRadius!),
-                        ),
+                            color: widget.theme!.contentBackgroundColor, borderRadius: widget.theme!.contentRadius),
                         padding: widget.theme!.contentPadding,
                         width: double.infinity,
                         child: widget.content,
@@ -381,10 +375,7 @@ class _ExpandedTileState extends State<ExpandedTile>
                       ? null
                       : Container(
                           decoration: BoxDecoration(
-                            color: widget.theme!.contentBackgroundColor,
-                            borderRadius: BorderRadius.circular(
-                                widget.theme!.contentRadius!),
-                          ),
+                              color: widget.theme!.contentBackgroundColor, borderRadius: widget.theme!.contentRadius),
                           padding: widget.theme!.contentPadding,
                           width: double.infinity,
                           child: widget.content,
@@ -401,8 +392,7 @@ enum TileListConstructor {
   separated,
 }
 
-typedef ExpandedTileBuilder = ExpandedTile Function(
-    BuildContext context, int index, ExpandedTileController controller);
+typedef ExpandedTileBuilder = ExpandedTile Function(BuildContext context, int index, ExpandedTileController controller);
 
 /// An extension of the listview returning a list of [ExpandedTile] widgets which are
 /// Expansion tile similar to the list tile supports leading widget,
@@ -533,15 +523,10 @@ class _ExpandedTileListState extends State<ExpandedTileList> {
                               .enabled
                           ? () {}
                           : () {
-                              int _openedTiles = tileControllers
-                                  .where((c) => c.isExpanded == true)
-                                  .toList()
-                                  .length;
+                              int _openedTiles = tileControllers.where((c) => c.isExpanded == true).toList().length;
                               if (_openedTiles > widget.maxOpened) {
                                 tileControllers
-                                    .where((c) =>
-                                        c.isExpanded == true &&
-                                        c != tileControllers[index])
+                                    .where((c) => c.isExpanded == true && c != tileControllers[index])
                                     .first
                                     .collapse();
                               }
@@ -599,14 +584,11 @@ class _ExpandedTileListState extends State<ExpandedTileList> {
                               if (tileControllers[index].isExpanded) {
                                 if (openedTiles == widget.maxOpened) {
                                   openedTilesControllers.last.collapse();
-                                  openedTilesControllers
-                                      .remove(openedTilesControllers.last);
+                                  openedTilesControllers.remove(openedTilesControllers.last);
                                 }
-                                openedTilesControllers
-                                    .add(tileControllers[index]);
+                                openedTilesControllers.add(tileControllers[index]);
                               } else {
-                                openedTilesControllers
-                                    .remove(tileControllers[index]);
+                                openedTilesControllers.remove(tileControllers[index]);
                               }
                               if (widget
                                       .itemBuilder(
