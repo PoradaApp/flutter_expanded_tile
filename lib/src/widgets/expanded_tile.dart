@@ -246,17 +246,11 @@ class _ExpandedTileState extends State<ExpandedTile> with SingleTickerProviderSt
             color: widget.theme!.headerColor,
             shape: _isExpanded && widget.theme?.fullExpandedBorder != null ? null : widget.theme?.headerBorder,
             borderRadius: _isExpanded && widget.theme?.fullExpandedBorder != null
-                ? BorderRadius.vertical(
-                    bottom: Radius.zero,
-                    top: Radius.circular(widget.theme?.fullExpandedBorder?.borderRadius.topLeft.x ?? 0),
-                  )
+                ? widget.theme?.fullExpandedBorder?.borderRadius ?? BorderRadius.circular(0)
                 : null,
             child: InkWell(
               borderRadius: _isExpanded && widget.theme?.fullExpandedBorder != null
-                  ? BorderRadius.vertical(
-                      bottom: Radius.zero,
-                      top: Radius.circular(widget.theme?.fullExpandedBorder?.borderRadius.topLeft.x ?? 0),
-                    )
+                  ? widget.theme?.fullExpandedBorder?.borderRadius ?? BorderRadius.circular(0)
                   : widget.theme?.headerBorder?.borderRadius ?? BorderRadius.circular(6),
               splashColor: widget.theme!.headerSplashColor,
               onTap: _onTapped,
